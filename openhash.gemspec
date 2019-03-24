@@ -5,7 +5,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "openhash"
-  spec.version       = '0.0.2'
+  spec.version       = '0.0.3'
   spec.authors       = ["cenxky"]
   spec.email         = ["cenxky@gmail.com"]
 

@@ -57,7 +57,7 @@ class OpenHash < OpenStruct
           last_ohash = last_ohash[method_name]
         end
 
-        last_ohash[name] = args[0]
+        last_ohash[$1] = args[0]
       else
         self << name
       end
