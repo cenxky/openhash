@@ -7,7 +7,7 @@ require 'ostruct'
 #
 #   person = OpenHash.new(name: "John Smith", hometown: { city: "London" })
 #   person.name #=> "John Smith"
-#   person.hometown.country #=> "UK"
+#   person.hometown.city #=> "London"
 #
 #   person = OpenHash.new
 #   person.name = "Piter Lee"
