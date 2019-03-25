@@ -5,15 +5,15 @@ require 'ostruct'
 # OpenHash lets Hash called and assigned by the key in chainable way.
 # Example:
 #
-#   person = OpenHash.new(name: "John Smith", hometown: { city: "London" })
-#   person.name #=> "John Smith"
+#   person = OpenHash.new(name: "John", hometown: { city: "London" })
+#   person.name #=> "John"
 #   person.hometown.city #=> "London"
 #
 #   person = OpenHash.new
-#   person.name = "Piter Lee"
-#   person.hometown.city = "Guangzhou"
-#   person.parents.father.name = "Heron Lee"
-#   person #=> { name: "Piter Lee", hometown: { city: "Guangzhou" }, parents: { father: { name: "Heron Lee" } } }
+#   person.name = "Lion"
+#   person.hometown.city = "Paris"
+#   person.parents.father.name = "Heron"
+#   person #=> { name: "Lion", hometown: { city: "Paris" }, parents: { father: { name: "Heron" } } }
 #
 class OpenHash < OpenStruct
   def initialize(hash = {})
@@ -32,9 +32,18 @@ class OpenHash < OpenStruct
 
   # BlackHole Class
   class BlackHole < BasicObject
+    DELEGATE_REGEX = /(.+\?)|(to_.+)|(={2,3})\z/.freeze
+    @nil_methods = ::NilClass.instance_methods.grep(DELEGATE_REGEX)
+
     def initialize(ohash, *args)
       @ohash = ohash
       @chain_methods = args
+    end
+
+    @nil_methods.each do |method_name|
+      define_method method_name do |*args|
+        nil.send(method_name, *args)
+      end
     end
 
     def inspect
@@ -53,8 +62,11 @@ class OpenHash < OpenStruct
         last_ohash = @ohash
 
         @chain_methods.each do |method_name|
-          last_ohash[method_name] = ::OpenHash.new
-          last_ohash = last_ohash[method_name]
+          last_ohash = if last_ohash.respond_to?(method_name)
+            last_ohash[method_name]
+          else
+            last_ohash[method_name] = ::OpenHash.new
+          end
         end
 
         last_ohash[$1] = args[0]

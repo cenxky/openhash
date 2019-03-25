@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    openhash (0.0.2)
+    openhash (0.0.4)
 
 GEM
   remote: https://rubygems.org/
