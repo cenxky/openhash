@@ -12,7 +12,7 @@ RSpec.describe OpenHash do
     end
 
     it 'gets inexistent key' do
-      expect(ohash.nothing).to eq(nil)
+      expect(ohash.nothing).to be_nil?
     end
   end
 

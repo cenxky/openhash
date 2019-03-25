@@ -33,7 +33,7 @@ class OpenHash < OpenStruct
   # BlackHole Class
   class BlackHole < BasicObject
     DELEGATE_REGEX = /(.+\?)|(to_.+)|(={2,3})\z/.freeze
-    @nil_methods = ::NilClass.instance_methods.grep(DELEGATE_REGEX)
+    @nil_methods = ::NilClass.instance_methods(false).grep(DELEGATE_REGEX)
 
     def initialize(ohash, *args)
       @ohash = ohash
