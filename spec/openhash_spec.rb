@@ -16,6 +16,23 @@ RSpec.describe OpenHash do
     end
   end
 
+  context 'calling array' do
+    let(:hash) { { cities: [{ name: "London" }, { name: "Paris" }] } }
+    let(:ohash) { OpenHash.new hash }
+
+    it 'gets cities' do
+      expect(ohash.cities).to be_instance_of(Array)
+    end
+
+    it 'gets first ciry name' do
+      expect(ohash.cities[0].name).to eq('London')
+    end
+
+    it 'gets last ciry name' do
+      expect(ohash.cities[-1].name).to eq('Paris')
+    end
+  end
+
   context 'assignment' do
     let(:ohash) { OpenHash.new }
 
@@ -32,6 +49,22 @@ RSpec.describe OpenHash do
     it 'assigns parents.father.name' do
       ohash.parents.father.name = 'Heron Lee'
       expect(ohash.parents.father.name).to eq('Heron Lee')
+    end
+
+    context 'blackhole' do
+      let(:ohash) { OpenHash.new }
+
+      it 'equals nil' do
+        expect(ohash.nothing.nil?).to eq(true)
+        expect(ohash.nothing == nil).to eq(true)
+        expect(ohash.nothing === nil).to eq(true)
+      end
+
+      it 'raises an error for operators which not a methods of NilClass' do
+        expect { ohash.nothing > 100 }.to raise_error(NoMethodError)
+        expect { ohash.nothing < 100 }.to raise_error(NoMethodError)
+        expect { ohash.nothing[100] }.to raise_error(NoMethodError)
+      end
     end
   end
 end

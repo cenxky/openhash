@@ -5,9 +5,10 @@ require 'ostruct'
 # OpenHash lets Hash called and assigned by the key in chainable way.
 # Example:
 #
-#   person = OpenHash.new(name: "John", hometown: { city: "London" })
+#   person = OpenHash.new(name: "John", hometown: { city: "London" }, pets: [{ name: "Mia", animal: "Cat" }])
 #   person.name #=> "John"
 #   person.hometown.city #=> "London"
+#   person.pets[0].name #=> "Mia"
 #
 #   person = OpenHash.new
 #   person.name = "Lion"
@@ -18,7 +19,14 @@ require 'ostruct'
 class OpenHash < OpenStruct
   def initialize(hash = {})
     hash = hash.each_with_object({}) do |(k, v), r|
-      r[k] = v.is_a?(Hash) ? OpenHash.new(v) : v
+      r[k] = case v
+      when Hash, OpenStruct
+        OpenHash.new(v)
+      when Array
+        v.map { |x| OpenHash.new(x) }
+      else
+        v
+      end
     end
 
     super
@@ -32,22 +40,17 @@ class OpenHash < OpenStruct
 
   # BlackHole Class
   class BlackHole < BasicObject
-    DELEGATE_REGEX = /(.+\?)|(to_.+)|(={2,3})\z/.freeze
-    @nil_methods = ::NilClass.instance_methods(false).grep(DELEGATE_REGEX)
+    NIL_METHODS = ::NilClass.instance_methods(false) | %i[== != ! equal? is_a? kind_of? instance_of?]
 
     def initialize(ohash, *args)
       @ohash = ohash
       @chain_methods = args
     end
 
-    @nil_methods.each do |method_name|
+    NIL_METHODS.each do |method_name|
       define_method method_name do |*args|
         nil.send(method_name, *args)
       end
-    end
-
-    def inspect
-      "nil"
     end
 
     # Append a method name to chain methods
@@ -70,6 +73,8 @@ class OpenHash < OpenStruct
         end
 
         last_ohash[$1] = args[0]
+      when /\A[^a-z_A-Z]+/
+        nil.send(name, *args)
       else
         self << name
       end
